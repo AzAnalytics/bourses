@@ -17,15 +17,15 @@ hier = today - timedelta(days=1)
 date_format_yfinance = hier.strftime('%Y-%m-%d')  # Format pour yfinance
 date_format_db = hier.strftime('%d/%m/%Y')  # Format pour la base de données
 
-for symbole in symboles.values():
-    action = yf.Ticker(symbole)
-    print(f"Récupération des données pour {symbole} à partir de {date_format_yfinance}")
+for symbole, ticker in symboles.items():
+    action = yf.Ticker(ticker)
+    print(f"Récupération des données pour {symbole} ({ticker}) à partir de {date_format_yfinance}")
     try:
         historique = action.history(start=date_format_yfinance, end=(today + timedelta(days=1)).strftime('%Y-%m-%d'))
         print(f"Données reçues pour {symbole} : {historique}")
         
         if historique.empty:
-            print(f"Aucune donnée trouvée pour {symbole} à la date {date_format_db}.")
+            print(f"Aucune donnée trouvée pour {symbole} ({ticker}) à la date {date_format_db}.")
             continue
         
         dernier = historique.iloc[-1]
@@ -36,9 +36,9 @@ for symbole in symboles.values():
             'Low': dernier['Low'],
             'Close': dernier['Close'],
             'Volume': dernier['Volume'],
-            'Symbole': symbole
+            'Symbole': ticker
         }
         collection.insert_one(document)
         print(f"Inséré : {document}")
     except Exception as e:
-        print(f"Erreur lors de la récupération des données pour {symbole} : {e}")
+        print(f"Erreur lors de la récupération des données pour {symbole} ({ticker}) : {e}")
