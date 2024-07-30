@@ -19,7 +19,8 @@ date_format_db = hier.strftime('%d/%m/%Y')  # Format pour la base de données
 
 for symbole in symboles.values():
     action = yf.Ticker(symbole)
-    historique = action.history(start=date_format_yfinance, end=datetime.now().strftime('%Y-%m-%d'))
+    # Essayer une plage de dates plus large pour s'assurer d'obtenir des données
+    historique = action.history(start=date_format_yfinance, end=(today + timedelta(days=1)).strftime('%Y-%m-%d'))
     if not historique.empty:
         dernier = historique.iloc[-1]
         document = {
