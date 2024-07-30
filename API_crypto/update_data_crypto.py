@@ -20,15 +20,14 @@ date_format_db = hier.strftime('%d/%m/%Y')  # Format pour la base de données
 for symbole in symboles.values():
     action = yf.Ticker(symbole)
     print(f"Récupération des données pour {symbole} à partir de {date_format_yfinance}")
-    historique = action.history(start=date_format_yfinance, end=(today + timedelta(days=1)).strftime('%Y-%m-%d'))
-    
-    if historique.empty:
-        print(f"Aucune donnée trouvée pour {symbole} à la date {date_format_db}.")
-        continue
-    
-    print(f"Données reçues pour {symbole} : {historique}")
-    
     try:
+        historique = action.history(start=date_format_yfinance, end=(today + timedelta(days=1)).strftime('%Y-%m-%d'))
+        print(f"Données reçues pour {symbole} : {historique}")
+        
+        if historique.empty:
+            print(f"Aucune donnée trouvée pour {symbole} à la date {date_format_db}.")
+            continue
+        
         dernier = historique.iloc[-1]
         document = {
             'Date': date_format_db,  # Utilisez le format de date pour la base de données
@@ -41,5 +40,5 @@ for symbole in symboles.values():
         }
         collection.insert_one(document)
         print(f"Inséré : {document}")
-    except IndexError as e:
-        print(f"Erreur lors de l'accès aux données pour {symbole} : {e}")
+    except Exception as e:
+        print(f"Erreur lors de la récupération des données pour {symbole} : {e}")
